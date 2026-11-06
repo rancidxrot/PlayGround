@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#080b1c">
+<title>MAZE//RUSH — Pac-Man at ludicrous speed</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+:root{color-scheme:dark;--bg:#080b1c;--panel:#11162b;--cyan:#62f7ff;--pink:#ff4d9d;--yellow:#ffe761;--muted:#8790b0}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:#f6f7ff;font-family:'Space Grotesk',sans-serif}body{display:grid;place-items:center;background:radial-gradient(ellipse at 50% 40%,#141b39 0,#080b1c 68%)}
+.app{width:min(1120px,100vw);padding:24px;position:relative}.topline{display:flex;align-items:center;justify-content:space-between;margin:0 2px 14px}.brand{display:flex;align-items:center;gap:12px}.brand-mark{width:32px;height:32px;border-radius:50%;background:var(--yellow);box-shadow:0 0 22px #ffe76170;position:relative}.brand-mark:after{content:'';position:absolute;right:-1px;top:7px;border-top:9px solid transparent;border-bottom:9px solid transparent;border-right:0;border-left:15px solid var(--bg)}h1{font-size:18px;letter-spacing:.13em;margin:0;font-weight:700}.brand small{display:block;color:var(--cyan);font:10px 'DM Mono',monospace;letter-spacing:.19em;margin-top:3px}.live{font:11px 'DM Mono',monospace;color:#93a0bf;letter-spacing:.12em}.live b{color:#ff558c;margin-right:6px;animation:blink 1s infinite}@keyframes blink{50%{opacity:.25}}
+.game-shell{background:linear-gradient(145deg,#151b35,#0b1023);border:1px solid #293355;border-radius:18px;padding:12px;box-shadow:0 26px 90px #0008,0 0 50px #202e6340;position:relative}.hud{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;padding:2px 10px 11px;gap:8px}.stat-label{font:9px 'DM Mono',monospace;letter-spacing:.18em;color:#818eaf}.stat-value{font-size:20px;font-weight:700;line-height:1.1;margin-top:3px;font-variant-numeric:tabular-nums}.hud-center{text-align:center}.hud-right{text-align:right}.life-row{color:var(--yellow);font-size:17px;letter-spacing:3px}.stage{color:var(--cyan)}
+.board-wrap{position:relative;overflow:hidden;border-radius:10px;background:#070a19;border:1px solid #273254;touch-action:none}.board-wrap canvas{display:block;width:100%;height:auto;aspect-ratio:17/18}.bottomline{display:flex;justify-content:space-between;align-items:center;padding:10px 8px 1px;color:#8993b1;font:10px 'DM Mono',monospace;letter-spacing:.05em}.bottomline strong{color:var(--cyan);font-weight:500}.controls{display:none;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(2,50px);gap:7px;justify-content:center;margin:15px auto 0}.ctrl{border:1px solid #38446a;background:#151c37;color:white;border-radius:13px;font-size:21px;touch-action:manipulation;box-shadow:inset 0 1px #ffffff12}.ctrl:active{background:#26335c;color:var(--cyan)}.ctrl[data-dir=up]{grid-column:2}.ctrl[data-dir=left]{grid-column:1;grid-row:2}.ctrl[data-dir=down]{grid-column:2;grid-row:2}.ctrl[data-dir=right]{grid-column:3;grid-row:2}
+.overlay{position:absolute;inset:0;display:grid;place-items:center;background:#080b1cc9;backdrop-filter:blur(5px);z-index:3;transition:opacity .2s}.overlay.hidden{opacity:0;pointer-events:none}.card{text-align:center;padding:24px;width:min(420px,90%)}.eyebrow{font:10px 'DM Mono',monospace;letter-spacing:.25em;color:var(--cyan)}.card h2{font-size:clamp(34px,7vw,58px);line-height:.95;letter-spacing:-.055em;margin:15px 0 10px;text-transform:uppercase}.card h2 em{font-style:normal;color:var(--yellow);text-shadow:0 0 30px #ffe76170}.card p{color:#a7b0ce;font-size:14px;line-height:1.5;margin:0 auto 20px;max-width:330px}.play-btn{border:0;border-radius:999px;background:var(--yellow);color:#141525;font:700 13px 'DM Mono',monospace;letter-spacing:.13em;padding:15px 30px;cursor:pointer;box-shadow:0 0 28px #ffe76150;transition:transform .15s,box-shadow .15s}.play-btn:hover{transform:translateY(-2px);box-shadow:0 0 42px #ffe76180}.key-hint{margin-top:14px;color:#7580a0;font:10px 'DM Mono',monospace}.toast{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);z-index:2;pointer-events:none;color:var(--yellow);font:700 clamp(20px,5vw,36px) 'DM Mono',monospace;letter-spacing:.12em;text-shadow:0 0 24px #ffe76190;opacity:0;white-space:nowrap}.toast.show{animation:toast .9s ease-out}@keyframes toast{0%{opacity:0;transform:translate(-50%,-30%) scale(.8)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-80%)}}
+@media(max-width:650px){.app{padding:10px}.topline{margin:0 4px 9px}.live{font-size:9px}.game-shell{padding:8px;border-radius:14px}.hud{padding:1px 5px 8px}.stat-value{font-size:17px}.stat-label{font-size:8px}.bottomline{font-size:9px;padding-top:8px}.controls{display:grid}.brand-mark{width:27px;height:27px}.brand-mark:after{top:6px;border-top-width:8px;border-bottom-width:8px;border-left-width:13px}h1{font-size:15px}}
+@media(max-height:1000px) and (min-width:651px){.app{width:min(1120px,100vw,calc((100vh - 160px)*17 / 18 + 50px));padding:10px}.topline{margin-bottom:8px}.game-shell{padding:8px}.hud{padding-bottom:6px}.bottomline{padding-top:7px}}
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="topline"><div class="brand"><div class="brand-mark"></div><div><h1>MAZE//RUSH</h1><small>NO BRAKES. NO MERCY.</small></div></div><div class="live"><b>●</b> SPEED RUN MODE</div></header>
+  <section class="game-shell" aria-label="Maze Rush game">
+    <div class="hud"><div><div class="stat-label">SCORE</div><div class="stat-value" id="score">000000</div></div><div class="hud-center"><div class="stat-label">SECTOR</div><div class="stat-value stage" id="level">01</div></div><div class="hud-right"><div class="stat-label">LIVES</div><div class="stat-value life-row" id="lives">● ● ●</div></div></div>
+    <div class="board-wrap" id="boardWrap"><canvas id="game" aria-label="Maze game board"></canvas><div class="toast" id="toast">HYPER SPEED</div><div class="overlay" id="overlay"><div class="card"><div class="eyebrow">A CLASSIC, UNLEASHED</div><h2>READY?<br><em>RUSH.</em></h2><p>Eat the dots. Outrun the ghosts. The longer you survive, the faster it gets.</p><button class="play-btn" id="play">INSERT COIN&nbsp; / &nbsp;PLAY</button><div class="key-hint">ARROW KEYS / WASD &nbsp;·&nbsp; SWIPE OR D-PAD</div></div></div></div>
+    <div class="bottomline"><span>◀ &nbsp; MOVE FAST. THINK FASTER.</span><span><strong id="boostText">HYPERCHARGE</strong> &nbsp; // &nbsp; SPACE TO PAUSE</span></div>
+  </section>
+  <div class="controls" aria-label="Touch controls"><button class="ctrl" data-dir="up" aria-label="Up">▲</button><button class="ctrl" data-dir="left" aria-label="Left">◀</button><button class="ctrl" data-dir="down" aria-label="Down">▼</button><button class="ctrl" data-dir="right" aria-label="Right">▶</button></div>
+</main>
+<script>
+(() => {
+'use strict';
+const raw = [
+'#################','#.......#.......#','#.###.#.#.#.###.#','#o#...#...#...#o#',
+'#.##.###.#.###.##','#...............#','###.#.#####.#.###','#...#...#...#...#',
+'#.###.#.#.#.###.#','#.....#...#.....#','#.###.#.#.#.###.#','#...#...#...#...#',
+'###.#.#####.#.###','#...............#','#.##.###.#.###.##','#o#...#...#...#o#',
+'#.......#.......#','#################'];
+const W=17,H=18, canvas=document.getElementById('game'), ctx=canvas.getContext('2d');
+const overlay=document.getElementById('overlay'), scoreEl=document.getElementById('score'), livesEl=document.getElementById('lives'), levelEl=document.getElementById('level'), toast=document.getElementById('toast'), board=document.getElementById('boardWrap');
+const dirs={up:{x:0,y:-1},down:{x:0,y:1},left:{x:-1,y:0},right:{x:1,y:0}};
+let cell=32, dpr=1, map, pellets, player, ghosts, score=0, lives=3, level=1, running=false, paused=false, last=0, elapsed=0, power=0, boost=0, pulse=0, particles=[], swipeStart=null;
+function resetMap(){map=raw.map(r=>r.split(''));pellets=0;for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(map[y][x]==='.'||map[y][x]==='o')pellets++;}
+function makeActor(x,y,dir,speed,color){return{x,y,dir:dirs[dir],next:dirs[dir],speed,color,home:{x,y},mouth:0};}
+function initActors(){player=makeActor(8,15,'left',14,'#ffe761');ghosts=[makeActor(8,9,'left',9.4,'#ff477e'),makeActor(7,9,'up',8.9,'#52e9ff'),makeActor(9,9,'down',9.1,'#b67bff'),makeActor(8,5,'right',9.5,'#ff9b4a')];ghosts.forEach((g,i)=>g.wait=1.1+i*.7);}
+function start(){if(!running){score=0;lives=3;level=1;resetMap();initActors();running=true;paused=false;}overlay.classList.add('hidden');last=performance.now();requestAnimationFrame(frame);}
+document.getElementById('play').addEventListener('click',start);
+function requestDir(name){if(dirs[name])player.next=dirs[name];}
+window.addEventListener('keydown',e=>{const k=e.key.toLowerCase(), mapKey={arrowup:'up',w:'up',arrowdown:'down',s:'down',arrowleft:'left',a:'left',arrowright:'right',d:'right'};if(mapKey[k]){e.preventDefault();requestDir(mapKey[k]);if(!running)start();}if(k===' '){e.preventDefault();if(running){paused=!paused;last=performance.now();}}if(k==='enter'&&!running)start();});
+document.querySelectorAll('.ctrl').forEach(b=>{const press=e=>{e.preventDefault();requestDir(b.dataset.dir);if(!running)start();};b.addEventListener('pointerdown',press);});
+board.addEventListener('pointerdown',e=>{swipeStart={x:e.clientX,y:e.clientY};});board.addEventListener('pointerup',e=>{if(!swipeStart)return;let dx=e.clientX-swipeStart.x,dy=e.clientY-swipeStart.y;if(Math.max(Math.abs(dx),Math.abs(dy))>18)requestDir(Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up'));swipeStart=null;});
+function isOpen(x,y){return y>=0&&y<H&&x>=0&&x<W&&map[y][x]!=='#';}
+function centered(a){return Math.abs(a.x-Math.round(a.x))<.09&&Math.abs(a.y-Math.round(a.y))<.09;}
+function stepActor(a,dt,isPlayer=false){let remaining=a.speed*dt, loops=0;while(remaining>0&&loops++<5){if(centered(a)){a.x=Math.round(a.x);a.y=Math.round(a.y);if(isPlayer){const n=a.next;if(isOpen(a.x+n.x,a.y+n.y))a.dir=n;}else chooseGhost(a);if(!isOpen(a.x+a.dir.x,a.y+a.dir.y)){if(isPlayer)a.dir={x:0,y:0};else chooseGhost(a);if(!isOpen(a.x+a.dir.x,a.y+a.dir.y))return;}}
+const tx=a.x+a.dir.x,ty=a.y+a.dir.y,dist=Math.abs(a.dir.x)?Math.abs(tx-Math.round(a.x)):Math.abs(ty-Math.round(a.y));const move=Math.min(remaining,Math.max(dist,.0001));a.x+=a.dir.x*move;a.y+=a.dir.y*move;remaining-=move;
+if(isPlayer){const ix=Math.round(a.x),iy=Math.round(a.y);if(centered(a)&&isOpen(ix,iy)){const c=map[iy][ix];if(c==='.'||c==='o'){map[iy][ix]=' ';pellets--;score+=c==='o'?50:10;if(c==='o'){power=6;boost=1.15;burst(a.x,a.y,'#62f7ff',18);showToast('GHOSTS: EDIBLE');}else if(Math.random()<.035){boost=1.25;showToast('HYPER SPEED');}updateHud();}}}
+}}
+function chooseGhost(g){let options=Object.values(dirs).filter(d=>isOpen(Math.round(g.x)+d.x,Math.round(g.y)+d.y));if(options.length>1&&g.dir)options=options.filter(d=>!(d.x===-g.dir.x&&d.y===-g.dir.y));if(!options.length)return;let target=power>0?{x:g.home.x,y:g.home.y}:{x:player.x,y:player.y};if(Math.random()<.17)g.dir=options[(Math.random()*options.length)|0];else g.dir=options.sort((a,b)=>{let da=(g.x+a.x-target.x)**2+(g.y+a.y-target.y)**2,db=(g.x+b.x-target.x)**2+(g.y+b.y-target.y)**2;return power>0?db-da:da-db;})[0];}
+function updateHud(){scoreEl.textContent=String(score).padStart(6,'0');livesEl.textContent=Array.from({length:3},(_,i)=>i<lives?'●':'○').join(' ');levelEl.textContent=String(level).padStart(2,'0');}
+function showToast(text){toast.textContent=text;toast.classList.remove('show');void toast.offsetWidth;toast.classList.add('show');}
+function burst(x,y,color,n=8){for(let i=0;i<n;i++){let a=Math.random()*Math.PI*2,s=1+Math.random()*4;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.35+Math.random()*.45,color});}}
+function loseLife(){lives--;updateHud();burst(player.x,player.y,'#ffe761',25);if(lives<=0){running=false;overlay.classList.remove('hidden');overlay.querySelector('.eyebrow').textContent='RUN OVER  //  FINAL SCORE '+String(score).padStart(6,'0');overlay.querySelector('h2').innerHTML='NICE<br><em>RUN.</em>';overlay.querySelector('.play-btn').textContent='RUN IT BACK';}else{initActors();player.x=8;player.y=15;power=0;showToast('KEEP MOVING');}}
+function resize(){const w=board.clientWidth;dpr=Math.min(window.devicePixelRatio||1,2);cell=w/W;canvas.width=Math.round(w*dpr);canvas.height=Math.round(w*H/W*dpr);ctx.setTransform(dpr*cell,0,0,dpr*cell,0,0);draw();}
+window.addEventListener('resize',resize);
+function draw(){if(!ctx)return;ctx.clearRect(0,0,W,H);ctx.fillStyle='#070a19';ctx.fillRect(0,0,W,H);
+// Maze walls: soft neon inset tiles with restrained edge highlights
+for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(map&&map[y][x]==='#'){ctx.fillStyle='#111a3a';roundRect(x+.045,y+.045,.91,.91,.19);ctx.fill();ctx.strokeStyle='#263665';ctx.lineWidth=.035;ctx.stroke();ctx.fillStyle='#203160';roundRect(x+.17,y+.14,.66,.08,.04);ctx.fill();}}
+if(map)for(let y=0;y<H;y++)for(let x=0;x<W;x++){const c=map[y][x];if(c==='.'||c==='o'){const big=c==='o',r=big?.14:.055;ctx.beginPath();ctx.arc(x+.5,y+.5,big?r*(.84+.16*Math.sin(elapsed*8)):r,0,Math.PI*2);ctx.fillStyle=big?'#aafcff':'#d7e3ff';ctx.shadowColor=big?'#62f7ff':'#8ca9ff';ctx.shadowBlur=big?12:5;ctx.fill();ctx.shadowBlur=0;}}
+for(const p of particles){ctx.globalAlpha=Math.max(0,p.life/.8);ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,.045+Math.max(0,p.life)*.04,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;
+if(player)drawPlayer(player);if(ghosts)ghosts.forEach(drawGhost);
+}
+function roundRect(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r);}
+function drawPlayer(a){const angle=Math.atan2(a.dir.y,a.dir.x),open=.18+.28*Math.abs(Math.sin(a.mouth));ctx.save();ctx.translate(a.x+.5,a.y+.5);ctx.rotate(angle);ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,.39,open,Math.PI*2-open);ctx.closePath();ctx.fillStyle='#ffe761';ctx.shadowColor='#ffe761';ctx.shadowBlur=17;ctx.fill();ctx.restore();}
+function drawGhost(g){const x=g.x+.5,y=g.y+.5,r=.36,scared=power>0;ctx.save();ctx.translate(x,y);ctx.fillStyle=scared?'#306cff':g.color;ctx.shadowColor=scared?'#4c83ff':g.color;ctx.shadowBlur=12;ctx.beginPath();ctx.arc(0,-.02,r,Math.PI,0);ctx.lineTo(r,.31);for(let i=0;i<3;i++){ctx.lineTo(r-(i+.5)*(2*r/3),.24);ctx.lineTo(r-(i+1)*(2*r/3),.31);}ctx.lineTo(-r,-.02);ctx.closePath();ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(-.12,-.02,.09,.13,0,0,Math.PI*2);ctx.ellipse(.12,-.02,.09,.13,0,0,Math.PI*2);ctx.fill();ctx.fillStyle=scared?'#fff':'#18234a';ctx.beginPath();ctx.arc(-.12+g.dir.x*.035,-.02+g.dir.y*.04,.045,0,Math.PI*2);ctx.arc(.12+g.dir.x*.035,-.02+g.dir.y*.04,.045,0,Math.PI*2);ctx.fill();ctx.restore();}
+function frame(now){if(!running)return;const dt=Math.min(.04,(now-last)/1000||0);last=now;if(!paused){elapsed+=dt;pulse+=dt;power=Math.max(0,power-dt);boost=Math.max(0,boost-dt);player.speed=(15+Math.min(level-1,5)*.8)*(boost>0?1.32:1);player.mouth+=dt*22;stepActor(player,dt,true);for(const g of ghosts){g.wait=Math.max(0,g.wait-dt);if(g.wait===0)stepActor(g,dt);}
+for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=.96;p.vy*=.96;p.life-=dt;if(p.life<=0)particles.splice(i,1);}
+for(const g of ghosts){if(g.wait>0)continue;const dx=g.x-player.x,dy=g.y-player.y;if(dx*dx+dy*dy<.34){if(power>0){score+=200;g.x=g.home.x;g.y=g.home.y;g.wait=.6;burst(g.x,g.y,'#62f7ff',12);updateHud();}else{loseLife();break;}}}
+if(pellets<=0&&running){level++;resetMap();initActors();player.speed+=1;showToast('SECTOR '+String(level).padStart(2,'0'));updateHud();}}
+draw();if(running)requestAnimationFrame(frame);}
+resetMap();initActors();resize();updateHud();
+})();
+</script>
+</body>
+</html>
